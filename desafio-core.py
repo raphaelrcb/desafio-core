@@ -1,13 +1,18 @@
+import psycopg2
+from psycopg2 import Error
+
 def menu():
 
     menu = {}
-    menu['1']="Check postgres connection." 
+    menu['1']="Check postgres server info." 
     menu['2']="Add entry to database."
     menu['3']="See entrie in database"
     menu['4']="Convert to XML." 
     menu['5']="Exit"
+
     while True: 
         options=menu.keys()
+        print("======================================================")
         for entry in options: 
             print (entry, menu[entry])
         
