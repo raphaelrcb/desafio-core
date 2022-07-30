@@ -18,7 +18,7 @@ def menu():
         
         selection=input("Please Select:") 
         if selection =='1': 
-            print( "1 selected") 
+            get_server_info()
         elif selection == '2': 
             print( "2 selected")
         elif selection == '3':
@@ -31,6 +31,36 @@ def menu():
             print( "Unknown Option Selected!") 
 
     
+def get_server_info():
+    
+    print("======================================================")
+    try:
+        # Connect to an existing database
+        connection = psycopg2.connect(user="postgres",
+                                    password="postgres",
+                                    host="127.0.0.1",
+                                    port="5432",
+                                    database="alura")
+
+        # Create a cursor to perform database operations
+        cursor = connection.cursor()
+        # Print PostgreSQL details
+        print("PostgreSQL server information")
+        print(connection.get_dsn_parameters(), "\n")
+        # Executing a SQL query
+        cursor.execute("SELECT version();")
+        # Fetch result
+        record = cursor.fetchone()
+        print("You are connected to - ", record, "\n")
+
+    except (Exception, Error) as error:
+        print("Error while connecting to PostgreSQL", error)
+    finally:
+        if (connection):
+            
+            cursor.close()
+            connection.close()
+            print("Connection Succesfull! PostgreSQL connection is closed")
 
 
 if __name__ == "__main__":
