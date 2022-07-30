@@ -80,7 +80,15 @@ def see_table():
     for column in columns:
         columnList.append(column[0])
 
+    cursor.execute("SELECT * FROM pessoa")
+    rows = cursor.fetchall()
+
     print(columnList)
+    print(rows)
+
+    if (not rows) :
+        print("tables is empty")
+
 
 if __name__ == "__main__":
     menu()
