@@ -6,7 +6,7 @@ def menu():
     menu = {}
     menu['1']="Check postgres server info." 
     menu['2']="Add entry to database."
-    menu['3']="See entrie in database"
+    menu['3']="See entries in database"
     menu['4']="Convert to XML." 
     menu['5']="Exit"
 
@@ -40,7 +40,7 @@ def get_server_info():
                                     password="postgres",
                                     host="127.0.0.1",
                                     port="5432",
-                                    database="alura")
+                                    database="core-consulting")
 
         # Create a cursor to perform database operations
         cursor = connection.cursor()
