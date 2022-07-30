@@ -22,7 +22,7 @@ def menu():
         elif selection == '2': 
             print( "2 selected")
         elif selection == '3':
-            print( "3 selected") 
+            see_table()
         elif selection == '4':
             print("4 selected")
         elif selection == '5':     
@@ -62,6 +62,25 @@ def get_server_info():
             connection.close()
             print("Connection Succesfull! PostgreSQL connection is closed")
 
+def see_table():
+        # Connect to an existing database
+    columnList = []
+    print("======================================================")
+    connection = psycopg2.connect(user="postgres",
+                                  password="postgres",
+                                  host="127.0.0.1",
+                                  port="5432",
+                                  database="core-consulting")
+
+    # Create a cursor to perform database operations
+    cursor = connection.cursor()
+    cursor.execute("SELECT column_name from information_schema.columns where table_name = 'pessoa'")
+    columns = cursor.fetchall()
+
+    for column in columns:
+        columnList.append(column[0])
+
+    print(columnList)
 
 if __name__ == "__main__":
     menu()
