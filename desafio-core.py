@@ -93,24 +93,44 @@ def add_entry():
 
     columnList = []
     print("======================================================")
-    connection = psycopg2.connect(user="postgres",
-                                  password="postgres",
-                                  host="127.0.0.1",
-                                  port="5432",
-                                  database="core-consulting")
+    try:
+        connection = psycopg2.connect(user="postgres",
+                                    password="postgres",
+                                    host="127.0.0.1",
+                                    port="5432",
+                                    database="core-consulting")
 
-    # Create a cursor to perform database operations
-    cursor = connection.cursor()
-    cursor.execute("SELECT column_name from information_schema.columns where table_name = 'pessoa'")
-    columns = cursor.fetchall()
+        # Create a cursor to perform database operations
+        cursor = connection.cursor()
+        cursor.execute("SELECT column_name from information_schema.columns where table_name = 'pessoa'")
+        columns = cursor.fetchall()
 
-    for column in columns:
-        columnList.append(column[0])
+        for column in columns:
+            columnList.append(column[0])
 
-    print("These are the entries you need to add:")
-    print(columnList[1:])
-    print("*Dates in format YYYY-MM-DD")
-    inputs = get_inputs(columnList[1:])
+        print("These are the entries you need to add:")
+        print(columnList[1:])
+        print("*Dates in format YYYY-MM-DD")
+
+        records_to_insert = get_inputs(columnList[1:])
+        print(records_to_insert)
+        
+        psql_insert = "INSERT INTO pessoa (nome, nome_mae, local_nascimento, data_nascimento) VALUES (%s, %s, %s, %s)"
+        cursor.execute(psql_insert, (records_to_insert))
+        
+        connection.commit()
+        
+        count = cursor.rowcount
+        print(count, "Record inserted successfully into pessoa table")
+    
+    except (Exception, Error) as error:
+        print( "Failed to insert record into pessoa table", error) 
+
+    finally:
+        if connection:
+            cursor.close()
+            connection.close()
+            print("Connection to DB closed")
 
     
 def get_inputs(columnList):
