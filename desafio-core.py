@@ -24,12 +24,11 @@ def menu():
         elif selection == '3':
             see_table()
         elif selection == '4':
-            print("4 selected")
+            tableToXML()
         elif selection == '5':     
             break
         else: 
             print( "Unknown Option Selected!") 
-
     
 def get_server_info():
     
@@ -131,7 +130,6 @@ def add_entry():
             cursor.close()
             connection.close()
             print("Connection to DB closed")
-
     
 def get_inputs(columnList):
 
@@ -142,7 +140,45 @@ def get_inputs(columnList):
 
     print(inputs)
     return inputs
-   
+
+def tableToXML():
+
+    columnList = []
+    fileName   = 'pessoa.xml'
+    message    = '<pessoa>\n'
+    print("======================================================")
+    try:
+        connection = psycopg2.connect(user="postgres",
+                                    password="postgres",
+                                    host="127.0.0.1",
+                                    port="5432",
+                                    database="core-consulting")
+
+        cursor = connection.cursor()
+        cursor.execute("SELECT column_name from information_schema.columns where table_name = 'pessoa'")
+        columns = cursor.fetchall()
+
+        for column in columns:
+            columnList.append(column[0])
+
+        cursor.execute("SELECT * FROM pessoa")
+        rows = cursor.fetchall()
+
+        outfile = open(fileName, 'w')
+
+        outfile.write("Hello world")
+        
+
+    except (Exception, Error) as error:
+        print( "Cant connect to database", error) 
+
+    finally:
+        if connection:
+            cursor.close()
+            connection.close()
+            print("Connection to DB closed")
+            outfile.close() 
+
 
 if __name__ == "__main__":
     menu()
