@@ -20,7 +20,7 @@ def menu():
         if selection =='1': 
             get_server_info()
         elif selection == '2': 
-            print( "2 selected")
+            add_entry()
         elif selection == '3':
             see_table()
         elif selection == '4':
@@ -89,6 +89,40 @@ def see_table():
     if (not rows) :
         print("tables is empty")
 
+def add_entry(): 
+
+    columnList = []
+    print("======================================================")
+    connection = psycopg2.connect(user="postgres",
+                                  password="postgres",
+                                  host="127.0.0.1",
+                                  port="5432",
+                                  database="core-consulting")
+
+    # Create a cursor to perform database operations
+    cursor = connection.cursor()
+    cursor.execute("SELECT column_name from information_schema.columns where table_name = 'pessoa'")
+    columns = cursor.fetchall()
+
+    for column in columns:
+        columnList.append(column[0])
+
+    print("These are the entries you need to add:")
+    print(columnList[1:])
+    print("*Dates in format YYYY-MM-DD")
+    inputs = get_inputs(columnList[1:])
+
+    
+def get_inputs(columnList):
+
+    inputs = []
+    for col in columnList:
+        print("type value for %s: ", col)
+        inputs.append(input())
+
+    print(inputs)
+    return inputs
+   
 
 if __name__ == "__main__":
     menu()
