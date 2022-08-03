@@ -18,11 +18,11 @@ def menu():
         
         selection=input("Please Select:") 
         if selection =='1': 
-            get_server_info()
+            getServerInfo()
         elif selection == '2': 
-            add_entry()
+            addEntry()
         elif selection == '3':
-            see_table()
+            seeTable()
         elif selection == '4':
             tableToXML()
         elif selection == '5':     
@@ -30,7 +30,7 @@ def menu():
         else: 
             print( "Unknown Option Selected!") 
     
-def get_server_info():
+def getServerInfo():
     
     print("======================================================")
     try:
@@ -61,34 +61,44 @@ def get_server_info():
             connection.close()
             print("Connection Succesfull! PostgreSQL connection is closed")
 
-def see_table():
+def seeTable():
         # Connect to an existing database
     columnList = []
     print("======================================================")
-    connection = psycopg2.connect(user="postgres",
-                                  password="postgres",
-                                  host="127.0.0.1",
-                                  port="5432",
-                                  database="core-consulting")
+    try:
+        connection = psycopg2.connect(user="postgres",
+                                    password="postgres",
+                                    host="127.0.0.1",
+                                    port="5432",
+                                    database="core-consulting")
 
-    # Create a cursor to perform database operations
-    cursor = connection.cursor()
-    cursor.execute("SELECT column_name from information_schema.columns where table_name = 'pessoa'")
-    columns = cursor.fetchall()
+        # Create a cursor to perform database operations
+        cursor = connection.cursor()
+        cursor.execute("SELECT column_name from information_schema.columns where table_name = 'pessoa'")
+        columns = cursor.fetchall()
 
-    for column in columns:
-        columnList.append(column[0])
+        for column in columns:
+            columnList.append(column[0])
 
-    cursor.execute("SELECT * FROM pessoa")
-    rows = cursor.fetchall()
+        cursor.execute("SELECT * FROM pessoa")
+        rows = cursor.fetchall()
 
-    print(columnList)
-    print(rows)
+        print(columnList)
+        print(rows)
 
-    if (not rows) :
-        print("tables is empty")
+        if (not rows) :
+            print("tables is empty")
 
-def add_entry(): 
+    except (Exception, Error) as error:
+        print("Error while connecting to PostgreSQL", error)
+    finally:
+        if (connection):
+            
+            cursor.close()
+            connection.close()
+            print("Connection Succesfull! PostgreSQL connection is closed")
+
+def addEntry(): 
 
     columnList = []
     print("======================================================")
@@ -111,7 +121,7 @@ def add_entry():
         print(columnList[1:])
         print("*Dates in format YYYY-MM-DD")
 
-        records_to_insert = get_inputs(columnList[1:])
+        records_to_insert = getInputs(columnList[1:])
         print(records_to_insert)
         
         psql_insert = "INSERT INTO pessoa (nome, nome_mae, local_nascimento, data_nascimento) VALUES (%s, %s, %s, %s)"
@@ -131,7 +141,7 @@ def add_entry():
             connection.close()
             print("Connection to DB closed")
     
-def get_inputs(columnList):
+def getInputs(columnList):
 
     inputs = []
     for col in columnList:
@@ -145,7 +155,6 @@ def tableToXML():
 
     columnList = []
     fileName   = 'pessoa.xml'
-    message    = '<pessoa>\n'
     print("======================================================")
     try:
         connection = psycopg2.connect(user="postgres",
@@ -166,8 +175,17 @@ def tableToXML():
 
         outfile = open(fileName, 'w')
 
-        outfile.write("Hello world")
-        
+        outfile.write('<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n')
+        outfile.write('<pessoa>\n')
+
+        for row in rows:
+            outfile.write('\t<row>\n')
+            for i in range(len(columnList)):
+                outfile.write('\t\t<%s>%s</%s>\n' % (columnList[i], row[i], columnList[i]))
+            outfile.write('\t</row>\n')
+        outfile.write('</pessoa>\n')
+        outfile.close() 
+
 
     except (Exception, Error) as error:
         print( "Cant connect to database", error) 
@@ -177,7 +195,6 @@ def tableToXML():
             cursor.close()
             connection.close()
             print("Connection to DB closed")
-            outfile.close() 
 
 
 if __name__ == "__main__":
